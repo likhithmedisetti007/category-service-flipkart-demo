@@ -1,14 +1,17 @@
 package com.likhith.category.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import com.likhith.category.document.Categories;
-import com.likhith.category.repository.CategoriesRepository;
+import com.likhith.category.document.Category;
+import com.likhith.category.exception.ValidationException;
+import com.likhith.category.repository.CategoryRepository;
 
 import jakarta.annotation.PostConstruct;
 
@@ -16,26 +19,41 @@ import jakarta.annotation.PostConstruct;
 public class CategoryServiceImpl implements CategoryService {
 
 	@Autowired
-	CategoriesRepository categoriesRepository;
+	CategoryRepository categoryRepository;
 
-	List<String> categories;
+	List<Category> categoryList;
 
 	@PostConstruct
+	@Override
 	public void loadDataFromMongoDB() {
-		List<Categories> categoriesList = categoriesRepository.findAll();
-
-		if (!CollectionUtils.isEmpty(categoriesList)) {
-			categories = categoriesList.stream().map(category -> category.getName()).collect(Collectors.toList());
-		}
+		categoryList = categoryRepository.findAll();
 	}
 
 	@Override
 	public List<String> getAllCategories() {
 
-		if (!CollectionUtils.isEmpty(categories)) {
-			return categories;
+		if (CollectionUtils.isEmpty(categoryList)) {
+			throw new ValidationException(HttpStatus.NOT_FOUND.value(), "Categories not loaded");
 		}
-		return null;
+
+		return categoryList.stream().map(category -> category.getName()).collect(Collectors.toList());
+	}
+
+	@Override
+	public Category getAllSubCategories(String category) {
+
+		if (CollectionUtils.isEmpty(categoryList)) {
+			throw new ValidationException(HttpStatus.NOT_FOUND.value(), "Categories not loaded");
+		}
+
+		Optional<Category> optionalCategory = categoryList.stream()
+				.filter(categories -> category.equalsIgnoreCase(categories.getName())).findFirst();
+
+		if (optionalCategory.isEmpty()) {
+			throw new ValidationException(HttpStatus.NOT_FOUND.value(), "No such category found");
+		}
+
+		return optionalCategory.get();
 	}
 
 }

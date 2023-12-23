@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.likhith.category.document.Category;
 import com.likhith.category.dto.CategoryResponse;
 import com.likhith.category.exception.ErrorMessage;
 import com.likhith.category.service.CategoryService;
@@ -22,7 +23,16 @@ public class CategoryController {
 	@Autowired
 	CategoryService categoryService;
 
-	@GetMapping("/getAllCategories")
+	@GetMapping("/protected/refreshCategoryList")
+	public String refreshCategoryList() {
+
+		categoryService.loadDataFromMongoDB();
+
+		return "CategoryList refreshed";
+
+	}
+
+	@GetMapping("/public/getAllCategories")
 	public ResponseEntity<CategoryResponse> getAllCategories() {
 
 		List<String> categories = categoryService.getAllCategories();
@@ -31,15 +41,22 @@ public class CategoryController {
 			return ResponseEntity.ok().body(new CategoryResponse(categories));
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND.value())
-					.body(new CategoryResponse(new ErrorMessage(HttpStatus.NOT_FOUND.value(), "No Categories Found")));
+					.body(new CategoryResponse(new ErrorMessage(HttpStatus.NOT_FOUND.value(), "No categories found")));
 		}
 
 	}
 
-	@GetMapping("/{category}/getAllSubCategories")
-	public ResponseEntity<List<CategoryResponse>> getAllSubCategories(@PathVariable("category") String category) {
+	@GetMapping("/public/{categoryName}/getAllSubCategories")
+	public ResponseEntity<CategoryResponse> getAllSubCategories(@PathVariable("categoryName") String categoryName) {
 
-		return null;
+		Category category = categoryService.getAllSubCategories(categoryName);
+
+		if (!CollectionUtils.isEmpty(category.getSubCategories())) {
+			return ResponseEntity.ok().body(new CategoryResponse(category));
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(
+					new CategoryResponse(new ErrorMessage(HttpStatus.NOT_FOUND.value(), "No subCategories found")));
+		}
 	}
 
 }

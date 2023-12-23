@@ -3,6 +3,7 @@ package com.likhith.category.dto;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.likhith.category.document.Category;
 import com.likhith.category.exception.ErrorMessage;
 
 import lombok.Data;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class CategoryResponse {
 
 	private List<String> categories;
+	private Category category;
 
 	private String name;
 	private String brand;
@@ -27,6 +29,11 @@ public class CategoryResponse {
 	public CategoryResponse(List<String> categories) {
 		super();
 		this.categories = categories;
+	}
+
+	public CategoryResponse(Category category) {
+		super();
+		this.category = category;
 	}
 
 	public CategoryResponse(ErrorMessage message) {
