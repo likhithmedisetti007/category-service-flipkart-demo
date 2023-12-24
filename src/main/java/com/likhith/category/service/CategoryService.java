@@ -15,4 +15,6 @@ public interface CategoryService {
 
 	Category getAllSubCategories(String category);
 
+	Category getAllProducts(String categoryName, String subCategoryName);
+
 }

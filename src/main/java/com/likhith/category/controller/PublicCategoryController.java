@@ -17,28 +17,19 @@ import com.likhith.category.exception.ErrorMessage;
 import com.likhith.category.service.CategoryService;
 
 @RestController
-@RequestMapping("/category")
-public class CategoryController {
+@RequestMapping("/category/public")
+public class PublicCategoryController {
 
 	@Autowired
 	CategoryService categoryService;
 
-	@GetMapping("/protected/refreshCategoryList")
-	public String refreshCategoryList() {
-
-		categoryService.loadDataFromMongoDB();
-
-		return "CategoryList refreshed";
-
-	}
-
-	@GetMapping("/public/getAllCategories")
+	@GetMapping("/getAllCategories")
 	public ResponseEntity<CategoryResponse> getAllCategories() {
 
-		List<String> categories = categoryService.getAllCategories();
+		List<String> categoriesList = categoryService.getAllCategories();
 
-		if (!CollectionUtils.isEmpty(categories)) {
-			return ResponseEntity.ok().body(new CategoryResponse(categories));
+		if (!CollectionUtils.isEmpty(categoriesList)) {
+			return ResponseEntity.ok().body(new CategoryResponse(categoriesList));
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND.value())
 					.body(new CategoryResponse(new ErrorMessage(HttpStatus.NOT_FOUND.value(), "No categories found")));
@@ -46,7 +37,7 @@ public class CategoryController {
 
 	}
 
-	@GetMapping("/public/{categoryName}/getAllSubCategories")
+	@GetMapping("/{categoryName}/getAllSubCategories")
 	public ResponseEntity<CategoryResponse> getAllSubCategories(@PathVariable("categoryName") String categoryName) {
 
 		Category category = categoryService.getAllSubCategories(categoryName);
@@ -56,6 +47,20 @@ public class CategoryController {
 		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND.value()).body(
 					new CategoryResponse(new ErrorMessage(HttpStatus.NOT_FOUND.value(), "No subCategories found")));
+		}
+	}
+
+	@GetMapping("/{categoryName}/{subCategoryName}/getAllProducts")
+	public ResponseEntity<CategoryResponse> getAllSubCategories(@PathVariable("categoryName") String categoryName,
+			@PathVariable("subCategoryName") String subCategoryName) {
+
+		Category category = categoryService.getAllProducts(categoryName, subCategoryName);
+
+		if (!CollectionUtils.isEmpty(category.getSubCategoryList().get(0).getProducts())) {
+			return ResponseEntity.ok().body(new CategoryResponse(category));
+		} else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND.value())
+					.body(new CategoryResponse(new ErrorMessage(HttpStatus.NOT_FOUND.value(), "No products found")));
 		}
 	}
 

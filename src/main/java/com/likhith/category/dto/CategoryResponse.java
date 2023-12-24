@@ -14,26 +14,19 @@ import lombok.NoArgsConstructor;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CategoryResponse {
 
-	private List<String> categories;
 	private Category category;
-
-	private String name;
-	private String brand;
-	private String description;
-	private Price price;
-	private Inventory inventory;
-	private List<Attributes> attributes;
+	private List<String> categoriesList;
 
 	private ErrorMessage message;
-
-	public CategoryResponse(List<String> categories) {
-		super();
-		this.categories = categories;
-	}
 
 	public CategoryResponse(Category category) {
 		super();
 		this.category = category;
+	}
+
+	public CategoryResponse(List<String> categoriesList) {
+		super();
+		this.categoriesList = categoriesList;
 	}
 
 	public CategoryResponse(ErrorMessage message) {
