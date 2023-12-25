@@ -9,6 +9,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.likhith.category.document.Category;
@@ -52,9 +53,13 @@ public class PublicCategoryController {
 
 	@GetMapping("/{categoryName}/{subCategoryName}/getAllProducts")
 	public ResponseEntity<CategoryResponse> getAllSubCategories(@PathVariable("categoryName") String categoryName,
-			@PathVariable("subCategoryName") String subCategoryName) {
+			@PathVariable("subCategoryName") String subCategoryName,
+			@RequestParam(name = "availability", defaultValue = "true") boolean availability,
+			@RequestParam(name = "minPrice", defaultValue = "0") double minPrice,
+			@RequestParam(name = "maxPrice", defaultValue = "9999999999999") double maxPrice) {
 
-		Category category = categoryService.getAllProducts(categoryName, subCategoryName);
+		Category category = categoryService.getAllProducts(categoryName, subCategoryName, availability, minPrice,
+				maxPrice);
 
 		if (!CollectionUtils.isEmpty(category.getSubCategoryList().get(0).getProducts())) {
 			return ResponseEntity.ok().body(new CategoryResponse(category));

@@ -13,6 +13,7 @@ import com.likhith.category.client.ElectronicsClient;
 import com.likhith.category.client.FashionClient;
 import com.likhith.category.document.Category;
 import com.likhith.category.downstream.dto.SubCategoryResponse;
+import com.likhith.category.dto.Product;
 import com.likhith.category.dto.SubCategory;
 import com.likhith.category.exception.ValidationException;
 import com.likhith.category.mapper.CategoryMapper;
@@ -69,7 +70,8 @@ public class CategoryServiceImpl implements CategoryService {
 	}
 
 	@Override
-	public Category getAllProducts(String categoryName, String subCategoryName) {
+	public Category getAllProducts(String categoryName, String subCategoryName, boolean availability, double minPrice,
+			double maxPrice) {
 
 		Category response = new Category();
 		SubCategoryResponse subCategoryResponse = null;
@@ -89,10 +91,10 @@ public class CategoryServiceImpl implements CategoryService {
 
 		switch (categoryName.toLowerCase()) {
 		case "fashion":
-			subCategoryResponse = fashionClient.getAllProducts(subCategoryName);
+			subCategoryResponse = fashionClient.getAllProducts(subCategoryName, availability, minPrice, maxPrice);
 			break;
 		case "electronics":
-			subCategoryResponse = electronicsClient.getAllProducts(subCategoryName);
+			subCategoryResponse = electronicsClient.getAllProducts(subCategoryName, availability, minPrice, maxPrice);
 			break;
 		default:
 			throw new ValidationException(HttpStatus.NOT_IMPLEMENTED.value(),
@@ -105,6 +107,63 @@ public class CategoryServiceImpl implements CategoryService {
 		response.setSubCategoryList(Arrays.asList(subCategory));
 
 		return response;
+	}
+
+	@Override
+	public String addProduct(String categoryName, String subCategoryName, Product product) {
+
+		String message = null;
+
+		switch (categoryName.toLowerCase()) {
+		case "fashion":
+			message = fashionClient.addProduct(subCategoryName, product);
+			break;
+		case "electronics":
+			message = electronicsClient.addProduct(subCategoryName, product);
+			break;
+		default:
+			throw new ValidationException(HttpStatus.NOT_IMPLEMENTED.value(),
+					"Unsupported subCategory: " + subCategoryName);
+		}
+		return message;
+	}
+
+	@Override
+	public String updateProduct(String categoryName, String subCategoryName, Product product) {
+
+		String message = null;
+
+		switch (categoryName.toLowerCase()) {
+		case "fashion":
+			message = fashionClient.updateProduct(subCategoryName, product);
+			break;
+		case "electronics":
+			message = electronicsClient.updateProduct(subCategoryName, product);
+			break;
+		default:
+			throw new ValidationException(HttpStatus.NOT_IMPLEMENTED.value(),
+					"Unsupported subCategory: " + subCategoryName);
+		}
+		return message;
+	}
+
+	@Override
+	public String deleteProduct(String categoryName, String subCategoryName, Product product) {
+
+		String message = null;
+
+		switch (categoryName.toLowerCase()) {
+		case "fashion":
+			message = fashionClient.deleteProduct(subCategoryName, product);
+			break;
+		case "electronics":
+			message = electronicsClient.deleteProduct(subCategoryName, product);
+			break;
+		default:
+			throw new ValidationException(HttpStatus.NOT_IMPLEMENTED.value(),
+					"Unsupported subCategory: " + subCategoryName);
+		}
+		return message;
 	}
 
 }
