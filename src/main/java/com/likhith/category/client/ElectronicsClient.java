@@ -16,7 +16,7 @@ import com.likhith.category.dto.Product;
 public interface ElectronicsClient {
 
 	@GetMapping("/{subCategoryName}/getAllProducts")
-	SubCategoryResponse getAllProducts(String subCategoryName,
+	SubCategoryResponse getAllProducts(@PathVariable("subCategoryName") String subCategoryName,
 			@RequestParam(name = "availability") boolean availability, @RequestParam(name = "minPrice") double minPrice,
 			@RequestParam(name = "maxPrice") double maxPrice);
 
